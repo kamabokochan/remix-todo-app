@@ -1,5 +1,5 @@
-/node_modules
+*/node_modules
+*/.cache
 
-/public
-/build
-/.cache
+/client/public
+/client/build
