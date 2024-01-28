@@ -17,6 +17,45 @@ async function main() {
     });
     return res.json(post);
   });
+
+  app.put("/status/:id", async (req, res) => {
+    const { id } = req.params;
+    const todo = await prisma.todos.findUnique({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    if (todo === null) {
+      res.status(404).json({ message: "IDが見つかりませんでした" });
+      return;
+    }
+
+    const updatePost = await prisma.todos.update({
+      where: {
+        id: parseInt(id),
+      },
+      data: {
+        status: todo.status === "pending" ? "completed" : "pending",
+      },
+    });
+    res.json(updatePost);
+  });
+
+  app.get("/todos", async (req, res) => {
+    const posts = await prisma.todos.findMany();
+    return res.json(posts);
+  });
+
+  app.delete("/todo/:id", async (req, res) => {
+    const { id } = req.params;
+    const deletedPost = await prisma.todos.delete({
+      where: {
+        id: parseInt(id),
+      },
+    });
+    res.json(deletedPost);
+  });
 }
 
 main()
