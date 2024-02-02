@@ -6,9 +6,13 @@ import {
   useLoaderData,
   Form,
 } from "@remix-run/react";
-import { useState } from "react";
 
 export async function loader() {
+  return await fetch("http://localhost:8000/todos");
+}
+
+export async function action({ request }) {
+  console.log(request);
   return await fetch("http://localhost:8000/todos");
 }
 
@@ -21,24 +25,6 @@ async function switchStatus(id) {
 
 export default function App() {
   const data = useLoaderData();
-  const [todo, setTodo] = useState("");
-
-  async function addTodo() {
-    try {
-      await fetch(`http://localhost:8000/todo/create`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: todo,
-        }),
-      });
-      setTodo("");
-    } catch (error) {
-      console.error(error);
-    }
-  }
 
   return (
     <html>
@@ -49,17 +35,16 @@ export default function App() {
       </head>
       <body>
         <h1>なんかTODOっぽいやつ🧸</h1>
-        <Form method="post">
-          <input
-            type="text"
-            onChange={(e) => setTodo(e.target.value)}
-            value={todo}
-          />
-          <button onClick={() => addTodo()}>追加</button>
+        <Form action={`create`} method="post">
+          <input type="text" name="title" />
+          <button type="submit">追加</button>
         </Form>
         <ul>
           {data.map((todo) => (
-            <li key={todo.id}>
+            <li
+              key={todo.id}
+              style={{ display: "flex", "align-items": "center", gap: "30px" }}
+            >
               <input
                 type="checkbox"
                 onChange={() => switchStatus(todo.id)}
@@ -77,8 +62,4 @@ export default function App() {
       </body>
     </html>
   );
-}
-
-export async function action() {
-  return await fetch("http://localhost:8000/todos");
 }
